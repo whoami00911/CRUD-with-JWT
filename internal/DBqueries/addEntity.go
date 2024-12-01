@@ -1,9 +1,9 @@
-package queries
+package DBqueries
 
 import (
 	"database/sql"
-	"webPractice1/cmd/errorPrinter"
-	"webPractice1/netHttp"
+	"webPractice1/internal/netHttp"
+	"webPractice1/pkg/errorPrinter"
 )
 
 func AddEntity(db *sql.DB, ar netHttp.AssetData) {

@@ -1,9 +1,9 @@
-package queries
+package DBqueries
 
 import (
 	"database/sql"
 	"fmt"
-	"webPractice1/cmd/errorPrinter"
+	"webPractice1/pkg/errorPrinter"
 )
 
 func DeleteAllEntitiesDB(db *sql.DB) {

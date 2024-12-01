@@ -2,7 +2,7 @@ package server
 
 import (
 	"net/http"
-	"webPractice1/cmd/errorPrinter"
+	"webPractice1/pkg/errorPrinter"
 )
 
 func StartServer() error {

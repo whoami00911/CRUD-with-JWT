@@ -1,10 +1,10 @@
-package queries
+package DBqueries
 
 import (
 	"database/sql"
 	"fmt"
-	"webPractice1/cmd/errorPrinter"
-	"webPractice1/netHttp"
+	"webPractice1/internal/netHttp"
+	"webPractice1/pkg/errorPrinter"
 )
 
 func GetEntity(db *sql.DB, ip string) *netHttp.AssetData {

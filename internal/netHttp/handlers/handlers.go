@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"strings"
 	"time"
-	"webPractice1/cmd/errorPrinter"
-	"webPractice1/netHttp"
-	connect "webPractice1/postgresql"
-	"webPractice1/postgresql/queries"
+	"webPractice1/internal/DBqueries"
+	"webPractice1/internal/netHttp"
+	"webPractice1/pkg/errorPrinter"
+	connect "webPractice1/pkg/postgresql"
 )
 
 type HandlerAssetsResponse struct {
@@ -61,7 +61,7 @@ func (har *HandlerAssetsResponse) TaskHandler(w http.ResponseWriter, req *http.R
 
 func (har *HandlerAssetsResponse) GetAllHandler(w http.ResponseWriter, req *http.Request) {
 	connect := connect.PostgresqlConnect()
-	jsonData, err := json.Marshal(queries.GetEntitys(connect))
+	jsonData, err := json.Marshal(DBqueries.GetEntitys(connect))
 	if err != nil {
 		errorPrinter.PrintCallerFunctionName(err)
 		return
@@ -99,7 +99,7 @@ func (har *HandlerAssetsResponse) CreateHandler(w http.ResponseWriter, req *http
 		defer har.Mu.Unlock()
 		delete(har.Cache, &asset)
 	}()
-	queries.AddEntity(connect.PostgresqlConnect(), asset)
+	DBqueries.AddEntity(connect.PostgresqlConnect(), asset)
 }
 
 func (har *HandlerAssetsResponse) DeleteAllHandler() {
@@ -108,7 +108,7 @@ func (har *HandlerAssetsResponse) DeleteAllHandler() {
 	for v := range har.Cache {
 		delete(har.Cache, v)
 	}
-	queries.DeleteAllEntitiesDB(connect.PostgresqlConnect())
+	DBqueries.DeleteAllEntitiesDB(connect.PostgresqlConnect())
 }
 
 func (har *HandlerAssetsResponse) DeleteHandler(w http.ResponseWriter, req *http.Request, ip string) {
@@ -119,7 +119,7 @@ func (har *HandlerAssetsResponse) DeleteHandler(w http.ResponseWriter, req *http
 			delete(har.Cache, v)
 		}
 	}
-	queries.DeleteEntityDB(connect.PostgresqlConnect(), ip)
+	DBqueries.DeleteEntityDB(connect.PostgresqlConnect(), ip)
 }
 
 func (har *HandlerAssetsResponse) GetHandler(w http.ResponseWriter, ip string) {
@@ -138,7 +138,7 @@ func (har *HandlerAssetsResponse) GetHandler(w http.ResponseWriter, ip string) {
 			return
 		}
 	}
-	jsonData, err := json.Marshal(queries.GetEntity(connect.PostgresqlConnect(), ip))
+	jsonData, err := json.Marshal(DBqueries.GetEntity(connect.PostgresqlConnect(), ip))
 	if err != nil {
 		errorPrinter.PrintCallerFunctionName(err)
 		return
