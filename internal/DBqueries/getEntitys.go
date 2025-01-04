@@ -3,7 +3,7 @@ package DBqueries
 import (
 	"database/sql"
 	"fmt"
-	"webPractice1/internal/netHttp"
+	netHttp "webPractice1/internal/transport"
 	"webPractice1/pkg/errorPrinter"
 )
 

@@ -1,6 +1,6 @@
 CREATE DATABASE IF NOT EXISTS `WebPractice1`;
 CREATE TABLE IF NOT EXISTS "AbuseEntity"(
-    "IPAddress" VARCHAR(45),            
+    "IPAddress" VARCHAR(15),            
     "IsPublic" BOOLEAN,                 
     "IPVersion" INT,                    
     "IsWhitelisted" BOOLEAN,            

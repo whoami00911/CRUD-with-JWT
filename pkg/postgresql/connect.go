@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"webPractice1/pkg/errorPrinter"
 
+	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	_ "github.com/spf13/viper"
@@ -24,6 +25,9 @@ type Postgres struct {
 }
 
 func PostgresqlConnect() *sql.DB {
+	if err := godotenv.Load("../.env"); err != nil {
+		errorPrinter.PrintCallerFunctionName(err)
+	}
 	cfg := new(Config)
 	if err := envconfig.Process("db", &cfg.DB); err != nil {
 		errorPrinter.PrintCallerFunctionName(err)

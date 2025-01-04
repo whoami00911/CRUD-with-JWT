@@ -2,12 +2,18 @@ package server
 
 import (
 	"net/http"
-	"webPractice1/pkg/errorPrinter"
+	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
-func StartServer() error {
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		errorPrinter.PrintCallerFunctionName(err)
+func StartServer(router *gin.Engine) (*http.Server, error) {
+	s := &http.Server{
+		Addr:         ":8080",
+		Handler:      router,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
-	return nil
+	go s.ListenAndServe()
+	return s, nil
 }

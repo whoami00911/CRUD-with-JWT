@@ -1,7 +1,6 @@
 package netHttp
 
 import (
-	"fmt"
 	"sync"
 	"time"
 )
@@ -37,8 +36,4 @@ type AssetData struct {
 
 func NewAsset() *AssetResponse {
 	return &AssetResponse{}
-}
-func (a AssetData) GetInfo() (string, error) {
-	return fmt.Sprintf("\n[IPAddress]:%s||[Provider]:%s||[Whitelist]:%t||[AbuseConfidenceScore]:%d||[CountryName]:%s||[CountryCode]:%s", a.IPAddress, a.ISP, a.IsWhitelisted,
-		a.AbuseConfidenceScore, a.CountryName, a.CountryCode), nil
 }

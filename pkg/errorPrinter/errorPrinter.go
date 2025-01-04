@@ -16,7 +16,7 @@ func PrintCallerFunctionName(err error) {
 	caller := runtime.FuncForPC(pc)
 	functionName := caller.Name()
 
-	file, err_ := os.OpenFile("log.txt", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0)
+	file, err_ := os.OpenFile("log.txt", os.O_APPEND|os.O_CREATE|os.O_RDWR, 755)
 	if err_ != nil {
 		fmt.Println("Error opening file__:", err_)
 		return
