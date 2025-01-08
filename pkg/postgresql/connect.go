@@ -3,7 +3,8 @@ package connect
 import (
 	"database/sql"
 	"fmt"
-	"webPractice1/pkg/errorPrinter"
+	"time"
+	"webPractice1/pkg/logger"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -12,7 +13,17 @@ import (
 )
 
 type Config struct {
-	DB Postgres
+	DB         Postgres
+	MaxRetries int
+	RetryDelay time.Duration
+}
+
+func ConfigInicialize() *Config {
+	return &Config{
+		DB:         Postgres{},
+		MaxRetries: 3,
+		RetryDelay: 3 * time.Second,
+	}
 }
 
 type Postgres struct {
@@ -25,28 +36,66 @@ type Postgres struct {
 }
 
 func PostgresqlConnect() *sql.DB {
+	logger := logger.GetLogger()
 	if err := godotenv.Load("../.env"); err != nil {
-		errorPrinter.PrintCallerFunctionName(err)
+		logger.Error(fmt.Sprintf("Truntransaction not started: %s", err))
 	}
-	cfg := new(Config)
+	cfg := ConfigInicialize()
 	if err := envconfig.Process("db", &cfg.DB); err != nil {
-		errorPrinter.PrintCallerFunctionName(err)
+		logger.Error(fmt.Sprintf("Truntransaction not started: %s", err))
 	}
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		cfg.DB.Host, cfg.DB.Port, cfg.DB.User, cfg.DB.Password, cfg.DB.Dbname)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-		errorPrinter.PrintCallerFunctionName(err)
+		logger.Error(fmt.Sprintf("Truntransaction not started: %s", err))
+		connectWithRetry(cfg)
 	}
 
 	err = db.Ping()
 	if err != nil {
+		logger.Error(fmt.Sprintf("Truntransaction not started: %s", err))
+		connectWithRetry(cfg)
 		db.Close()
-		errorPrinter.PrintCallerFunctionName(err)
-		return nil
 	}
 
-	fmt.Println("Successfully connected!")
+	//fmt.Println("Successfully connected!")
 	return db
+}
+
+func connectWithRetry(cfg *Config) *sql.DB {
+	logger := logger.GetLogger()
+	var err error
+
+	for i := 0; i < cfg.MaxRetries; i++ {
+		fmt.Printf("Попытка подключения к БД (%d/%d)...\n", i+1, cfg.MaxRetries)
+
+		// Пытаемся подключиться к БД
+		psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+			"password=%s dbname=%s sslmode=disable",
+			cfg.DB.Host, cfg.DB.Port, cfg.DB.User, cfg.DB.Password, cfg.DB.Dbname)
+		db, err := sql.Open("postgres", psqlInfo)
+		if err != nil {
+			fmt.Printf("Ошибка при открытии соединения: %v", err)
+			logger.Error(fmt.Sprintf("Retry connect to DB faild: %s", err))
+		} else if err = db.Ping(); err == nil {
+			// Успешное подключение
+			fmt.Println("Успешное подключение к базе данных!")
+			return db
+		}
+
+		// Если подключение не удалось, закрываем его
+		if db != nil {
+			_ = db.Close()
+		}
+
+		fmt.Printf("Не удалось подключиться, ожидаем %v перед повторной попыткой...\n", cfg.RetryDelay)
+		logger.Error(fmt.Sprintf("Retry connect to DB faild: %s", err))
+		time.Sleep(cfg.RetryDelay)
+	}
+
+	// Возвращаем ошибку, если не удалось подключиться
+	fmt.Println(fmt.Sprintf("не удалось подключиться к базе данных после %d попыток: %s", cfg.MaxRetries, err))
+	return nil
 }

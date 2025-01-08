@@ -2,11 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"time"
 	"webPractice1/internal/DBqueries"
 	handler "webPractice1/internal/transport"
-	"webPractice1/pkg/errorPrinter"
+	"webPractice1/pkg/logger"
 	connect "webPractice1/pkg/postgresql"
 
 	"github.com/gin-gonic/gin"
@@ -14,13 +15,15 @@ import (
 
 type HandlerAssetsResponse struct {
 	handler.AssetsResponse
+	Logger *logger.Logger
 }
 
-func NewHandlerAssetsResponse() *HandlerAssetsResponse {
+func NewHandlerAssetsResponse(log *logger.Logger) *HandlerAssetsResponse {
 	return &HandlerAssetsResponse{
 		AssetsResponse: handler.AssetsResponse{
 			Cache: make(map[*handler.AssetData]time.Time),
 		},
+		Logger: log,
 	}
 }
 
@@ -28,11 +31,11 @@ func (har *HandlerAssetsResponse) GetAllHandler(c *gin.Context) {
 	connect := connect.PostgresqlConnect()
 	jsonData, err := json.Marshal(DBqueries.GetEntitys(connect))
 	if err != nil {
-		errorPrinter.PrintCallerFunctionName(err)
+		har.Logger.Error(fmt.Sprintf("Marshal method error: %s", err))
 		c.JSON(500, gin.H{"error": "Internal Server Error"})
 		return
 	}
-	c.JSON(200, jsonData)
+	c.JSON(200, string(jsonData))
 }
 func (har *HandlerAssetsResponse) CreateHandler(c *gin.Context) {
 	har.Mu.Lock()
@@ -41,14 +44,14 @@ func (har *HandlerAssetsResponse) CreateHandler(c *gin.Context) {
 	ttl := time.Second * 15
 	reqBytes, err := io.ReadAll(c.Request.Body)
 	if err != nil {
-		errorPrinter.PrintCallerFunctionName(err)
+		har.Logger.Error(fmt.Sprintf("ReadAll method error: %s", err))
 		c.JSON(400, gin.H{"error": "Bad Request"})
 		return
 	}
 
 	var asset handler.AssetData
 	if err = json.Unmarshal(reqBytes, &asset); err != nil {
-		errorPrinter.PrintCallerFunctionName(err)
+		har.Logger.Error(fmt.Sprintf("Unmarshal method error: %s", err))
 		c.JSON(400, gin.H{"error": "Bad Request"})
 		return
 	}
@@ -99,19 +102,19 @@ func (har *HandlerAssetsResponse) GetHandler(c *gin.Context) {
 			v.IsDb = false // Нужно ли явное указание?
 			jsonData, err := json.Marshal(v)
 			if err != nil {
-				errorPrinter.PrintCallerFunctionName(err)
+				har.Logger.Error(fmt.Sprintf("Marshal method error: %s", err))
 				c.JSON(500, gin.H{"error": "Internal Server Error"})
 				return
 			}
-			c.JSON(200, jsonData)
+			c.JSON(200, string(jsonData))
 			return
 		}
 	}
 	jsonData, err := json.Marshal(DBqueries.GetEntity(connect.PostgresqlConnect(), ip))
 	if err != nil {
-		errorPrinter.PrintCallerFunctionName(err)
+		har.Logger.Error(fmt.Sprintf("Marshal method error: %s", err))
 		c.JSON(500, gin.H{"error": "Internal Server Error"})
 		return
 	}
-	c.JSON(200, jsonData)
+	c.JSON(200, string(jsonData))
 }

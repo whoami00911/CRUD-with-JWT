@@ -3,6 +3,7 @@ package main
 import (
 	//"net/http"
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -10,14 +11,15 @@ import (
 	"time"
 	"webPractice1/internal/server"
 	"webPractice1/internal/transport/handlers"
-	"webPractice1/pkg/errorPrinter"
+	"webPractice1/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	logger := logger.GetLogger()
 	router := gin.Default()
-	handler := handlers.NewHandlerAssetsResponse()
+	handler := handlers.NewHandlerAssetsResponse(logger)
 	//http.HandleFunc("/Abuseip/", handler.TaskHandler)
 	abuseipGroup := router.Group("/Abuseip")
 	{
@@ -33,7 +35,7 @@ func main() {
 
 	srv, err := server.StartServer(router)
 	if err != nil {
-		errorPrinter.PrintCallerFunctionName(err)
+		logger.Error(fmt.Sprintf("Server dont start: %s", err))
 	}
 
 	quit := make(chan os.Signal, 1)
@@ -41,15 +43,15 @@ func main() {
 	<-quit
 	log.Println("Shutdown Server ...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server Shutdown:", err)
+		logger.Error(fmt.Sprintf("Shutdown error: %s", err))
 	}
 	// catching ctx.Done(). timeout of 5 seconds.
 	select {
 	case <-ctx.Done():
-		log.Println("timeout of 5 seconds.")
+		log.Println("timeout of 1 seconds.")
 	}
 	log.Println("Server exiting")
 }
