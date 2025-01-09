@@ -1,0 +1,187 @@
+basePath: /
+definitions:
+  responces.AssetData:
+    properties:
+      abuseConfidenceScore:
+        description: Оценка злоупотребления (от 0 до 100)
+        type: integer
+      countryCode:
+        description: Код страны
+        type: string
+      countryName:
+        description: Название страны
+        type: string
+      ipAddress:
+        description: IP-адрес актива
+        type: string
+      ipVersion:
+        description: Версия IP (4 или 6)
+        type: integer
+      isCache:
+        type: boolean
+      isFromDB:
+        type: boolean
+      isPublic:
+        description: Является ли IP-адрес публичным
+        type: boolean
+      isTor:
+        description: Является ли IP узлом выхода Tor
+        type: boolean
+      isWhitelisted:
+        description: Находится ли IP-адрес в белом списке
+        type: boolean
+      isp:
+        description: Интернет-провайдер (ISP)
+        type: string
+      usageType:
+        description: Тип использования (например, дата-центр/веб-хостинг)
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: project4
+  title: rest with swagger
+  version: "1.0"
+paths:
+  /Abuseip/:
+    delete:
+      description: Delete all entitys from cache and database
+      responses:
+        "200":
+          description: All entitys deleted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete all entitys
+      tags:
+      - CRUD
+    get:
+      description: Get all entitys from database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responces.AssetData'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all entitys
+      tags:
+      - CRUD
+    post:
+      consumes:
+      - application/json
+      description: Create a new entity and store it in the database
+      parameters:
+      - description: Asset Data
+        in: body
+        name: asset
+        required: true
+        schema:
+          $ref: '#/definitions/responces.AssetData'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new entity
+      tags:
+      - CRUD
+    put:
+      consumes:
+      - application/json
+      description: Update existing entity in database
+      parameters:
+      - description: Asset Data
+        in: body
+        name: asset
+        required: true
+        schema:
+          $ref: '#/definitions/responces.AssetData'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Updated
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update existing entity
+      tags:
+      - CRUD
+  /Abuseip/{ip}:
+    delete:
+      description: Delete an entity by IP address from cache and database
+      parameters:
+      - description: IP Address
+        in: path
+        name: ip
+        required: true
+        type: string
+      responses:
+        "200":
+          description: entity deleted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete an entity by IP
+      tags:
+      - CRUD
+    get:
+      description: Get an entity by IP address from cache or database
+      parameters:
+      - description: IP Address
+        in: path
+        name: ip
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responces.AssetData'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get an entity by IP
+      tags:
+      - CRUD
+swagger: "2.0"

@@ -9,12 +9,23 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	_ "webPractice1/docs"
 	"webPractice1/internal/server"
 	"webPractice1/internal/transport/handlers"
 	"webPractice1/pkg/logger"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"     // swagger embed files
+	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
+
+// @title           rest with swagger
+// @version         1.0
+// @description     project4
+
+// @host      localhost:8080
+// @BasePath  /
 
 func main() {
 	logger := logger.GetLogger()
@@ -24,7 +35,7 @@ func main() {
 	abuseipGroup := router.Group("/Abuseip")
 	{
 		abuseipGroup.POST("/", handler.CreateHandler)
-		abuseipGroup.PUT("/", handler.CreateHandler)
+		abuseipGroup.PUT("/", handler.UpdateHandler)
 		abuseipGroup.GET("/", handler.GetAllHandler)
 		abuseipGroup.DELETE("/", handler.DeleteAllHandler)
 
@@ -32,6 +43,7 @@ func main() {
 		abuseipGroup.GET("/:ip", handler.GetHandler)
 		abuseipGroup.DELETE("/:ip", handler.DeleteHandler)
 	}
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	srv, err := server.StartServer(router)
 	if err != nil {

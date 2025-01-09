@@ -1,0 +1,278 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "project4",
+        "title": "rest with swagger",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/Abuseip/": {
+            "get": {
+                "description": "Get all entitys from database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CRUD"
+                ],
+                "summary": "Get all entitys",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responces.AssetData"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update existing entity in database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CRUD"
+                ],
+                "summary": "Update existing entity",
+                "parameters": [
+                    {
+                        "description": "Asset Data",
+                        "name": "asset",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/responces.AssetData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Updated",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new entity and store it in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CRUD"
+                ],
+                "summary": "Create a new entity",
+                "parameters": [
+                    {
+                        "description": "Asset Data",
+                        "name": "asset",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/responces.AssetData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete all entitys from cache and database",
+                "tags": [
+                    "CRUD"
+                ],
+                "summary": "Delete all entitys",
+                "responses": {
+                    "200": {
+                        "description": "All entitys deleted",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/Abuseip/{ip}": {
+            "get": {
+                "description": "Get an entity by IP address from cache or database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CRUD"
+                ],
+                "summary": "Get an entity by IP",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "IP Address",
+                        "name": "ip",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responces.AssetData"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an entity by IP address from cache and database",
+                "tags": [
+                    "CRUD"
+                ],
+                "summary": "Delete an entity by IP",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "IP Address",
+                        "name": "ip",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "entity deleted",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "responces.AssetData": {
+            "type": "object",
+            "properties": {
+                "abuseConfidenceScore": {
+                    "description": "Оценка злоупотребления (от 0 до 100)",
+                    "type": "integer"
+                },
+                "countryCode": {
+                    "description": "Код страны",
+                    "type": "string"
+                },
+                "countryName": {
+                    "description": "Название страны",
+                    "type": "string"
+                },
+                "ipAddress": {
+                    "description": "IP-адрес актива",
+                    "type": "string"
+                },
+                "ipVersion": {
+                    "description": "Версия IP (4 или 6)",
+                    "type": "integer"
+                },
+                "isCache": {
+                    "type": "boolean"
+                },
+                "isFromDB": {
+                    "type": "boolean"
+                },
+                "isPublic": {
+                    "description": "Является ли IP-адрес публичным",
+                    "type": "boolean"
+                },
+                "isTor": {
+                    "description": "Является ли IP узлом выхода Tor",
+                    "type": "boolean"
+                },
+                "isWhitelisted": {
+                    "description": "Находится ли IP-адрес в белом списке",
+                    "type": "boolean"
+                },
+                "isp": {
+                    "description": "Интернет-провайдер (ISP)",
+                    "type": "string"
+                },
+                "usageType": {
+                    "description": "Тип использования (например, дата-центр/веб-хостинг)",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

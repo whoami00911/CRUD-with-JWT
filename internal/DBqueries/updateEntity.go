@@ -7,7 +7,7 @@ import (
 	"webPractice1/pkg/logger"
 )
 
-func AddEntity(db *sql.DB, ar netHttp.AssetData) {
+func UpdateEntity(db *sql.DB, ar netHttp.AssetData) {
 	logger := logger.GetLogger()
 	tx, err := db.Begin()
 	if err != nil {
@@ -16,12 +16,10 @@ func AddEntity(db *sql.DB, ar netHttp.AssetData) {
 	}
 	ar.IsDb = true
 	_, err = tx.Exec(
-		`INSERT INTO "AbuseEntity" ("ipAddress", "isPublic", "ipVersion", "isWhitelisted", "abuseConfidenceScore", "countryCode", "countryName", "usageType", "isFromDB", "isTor", "isp")
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT ("ipAddress")
-		DO NOTHING`, ar.IPAddress, ar.IsPublic, ar.IPVersion, ar.IsWhitelisted, ar.AbuseConfidenceScore,
-		ar.CountryCode, ar.CountryName, ar.UsageType, ar.IsDb, ar.IsTor, ar.ISP)
+		`UPDATE "AbuseEntity" SET "isPublic" = $1, "ipVersion" = $2, "isWhitelisted" = $3, "abuseConfidenceScore" = $4, "countryCode" = $5, "countryName" = $6, "usageType" = $7, "isFromDB" = $8, "isTor" = $9, "isp" = $10 WHERE "ipAddress" = $11`, ar.IsPublic, ar.IPVersion, ar.IsWhitelisted, ar.AbuseConfidenceScore,
+		ar.CountryCode, ar.CountryName, ar.UsageType, ar.IsDb, ar.IsTor, ar.ISP, ar.IPAddress)
 	if err != nil {
-		logger.Error(fmt.Sprintf("INSERT ERROR: %s", err))
+		logger.Error(fmt.Sprintf("UPDATE ERROR: %s", err))
 		return
 	}
 	defer func() {
