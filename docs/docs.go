@@ -31,7 +31,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/responces.AssetData"
+                                "$ref": "#/definitions/domain.AssetData"
                             }
                         }
                     },
@@ -65,7 +65,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/responces.AssetData"
+                            "$ref": "#/definitions/domain.AssetData"
                         }
                     }
                 ],
@@ -109,7 +109,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/responces.AssetData"
+                            "$ref": "#/definitions/domain.AssetData"
                         }
                     }
                 ],
@@ -176,7 +176,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responces.AssetData"
+                            "$ref": "#/definitions/domain.AssetData"
                         }
                     },
                     "404": {
@@ -229,7 +229,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "responces.AssetData": {
+        "domain.AssetData": {
             "type": "object",
             "properties": {
                 "abuseConfidenceScore": {

@@ -5,27 +5,29 @@ import (
 	"fmt"
 	"io"
 	"time"
-	"webPractice1/internal/DBqueries"
-	responces "webPractice1/internal/transport"
+
+	"webPractice1/internal/domain"
+	"webPractice1/internal/service"
 	"webPractice1/pkg/logger"
-	connect "webPractice1/pkg/postgresql"
 
 	"github.com/gin-gonic/gin"
 )
 
 // HandlerAssetsResponse wraps handler.AssetsResponse with a logger
 type HandlerAssetsResponse struct {
-	responces.AssetsResponse
+	service *service.Service
+	domain.AssetsResponse
 	Logger *logger.Logger
 }
 
 // NewHandlerAssetsResponse initializes a new HandlerAssetsResponse
-func NewHandlerAssetsResponse(log *logger.Logger) *HandlerAssetsResponse {
+func NewHandlerAssetsResponse(log *logger.Logger, service *service.Service) *HandlerAssetsResponse {
 	return &HandlerAssetsResponse{
-		AssetsResponse: responces.AssetsResponse{
-			Cache: make(map[*responces.AssetData]time.Time),
+		AssetsResponse: domain.AssetsResponse{
+			Cache: make(map[*domain.AssetData]time.Time),
 		},
-		Logger: log,
+		Logger:  log,
+		service: service,
 	}
 }
 
@@ -34,12 +36,11 @@ func NewHandlerAssetsResponse(log *logger.Logger) *HandlerAssetsResponse {
 // @Description Get all entitys from database
 // @Tags CRUD
 // @Produce json
-// @Success 200 {array} responces.AssetData
+// @Success 200 {array} domain.AssetData
 // @Failure 500 {object} map[string]string "Internal Server Error"
 // @Router /Abuseip/ [get]
 func (har *HandlerAssetsResponse) GetAllHandler(c *gin.Context) {
-	connect := connect.PostgresqlConnect()
-	jsonData, err := json.Marshal(DBqueries.GetEntitys(connect))
+	jsonData, err := json.Marshal(har.service.CRUDList.GetEntities())
 	if err != nil {
 		har.Logger.Error(fmt.Sprintf("Marshal method error: %s", err))
 		c.JSON(500, gin.H{"error": "Internal Server Error"})
@@ -54,7 +55,7 @@ func (har *HandlerAssetsResponse) GetAllHandler(c *gin.Context) {
 // @Tags CRUD
 // @Accept json
 // @Produce json
-// @Param asset body responces.AssetData true "Asset Data"
+// @Param asset body domain.AssetData true "Asset Data"
 // @Success 201 {object} map[string]string "Created"
 // @Failure 400 {object} map[string]string "Bad Request"
 // @Router /Abuseip/ [post]
@@ -70,7 +71,7 @@ func (har *HandlerAssetsResponse) CreateHandler(c *gin.Context) {
 		return
 	}
 
-	var asset responces.AssetData
+	var asset domain.AssetData
 	if err = json.Unmarshal(reqBytes, &asset); err != nil {
 		har.Logger.Error(fmt.Sprintf("Unmarshal method error: %s", err))
 		c.JSON(400, gin.H{"error": "Bad Request"})
@@ -98,7 +99,7 @@ func (har *HandlerAssetsResponse) CreateHandler(c *gin.Context) {
 		defer har.Mu.Unlock()
 		delete(har.Cache, &asset)
 	}()
-	DBqueries.AddEntity(connect.PostgresqlConnect(), asset)
+	har.service.CRUDList.AddEntity(asset)
 	c.JSON(201, gin.H{"message": "Created"})
 }
 
@@ -108,7 +109,7 @@ func (har *HandlerAssetsResponse) CreateHandler(c *gin.Context) {
 // @Tags CRUD
 // @Accept json
 // @Produce json
-// @Param asset body responces.AssetData true "Asset Data"
+// @Param asset body domain.AssetData true "Asset Data"
 // @Success 201 {object} map[string]string "Updated"
 // @Failure 400 {object} map[string]string "Bad Request"
 // @Router /Abuseip/ [put]
@@ -124,7 +125,7 @@ func (har *HandlerAssetsResponse) UpdateHandler(c *gin.Context) {
 		return
 	}
 
-	var asset responces.AssetData
+	var asset domain.AssetData
 	if err = json.Unmarshal(reqBytes, &asset); err != nil {
 		har.Logger.Error(fmt.Sprintf("Unmarshal method error: %s", err))
 		c.JSON(400, gin.H{"error": "Bad Request"})
@@ -151,7 +152,7 @@ func (har *HandlerAssetsResponse) UpdateHandler(c *gin.Context) {
 			delete(har.Cache, &asset)
 		}()
 	}
-	DBqueries.UpdateEntity(connect.PostgresqlConnect(), asset)
+	har.service.CRUDList.UpdateEntity(asset)
 	c.JSON(201, gin.H{"message": "Updating"})
 }
 
@@ -167,7 +168,7 @@ func (har *HandlerAssetsResponse) DeleteAllHandler(c *gin.Context) {
 	for v := range har.Cache {
 		delete(har.Cache, v)
 	}
-	DBqueries.DeleteAllEntitiesDB(connect.PostgresqlConnect())
+	har.service.CRUDList.DeleteAllEntitiesDB()
 	c.JSON(200, gin.H{"message": "All assets deleted"})
 }
 
@@ -189,7 +190,7 @@ func (har *HandlerAssetsResponse) DeleteHandler(c *gin.Context) {
 			break
 		}
 	}
-	DBqueries.DeleteEntityDB(connect.PostgresqlConnect(), ip)
+	har.service.CRUDList.DeleteEntityDB(ip)
 	c.JSON(200, gin.H{"message": "Asset deleted"})
 }
 
@@ -199,7 +200,7 @@ func (har *HandlerAssetsResponse) DeleteHandler(c *gin.Context) {
 // @Tags CRUD
 // @Param ip path string true "IP Address"
 // @Produce json
-// @Success 200 {object} responces.AssetData
+// @Success 200 {object} domain.AssetData
 // @Failure 404 {object} map[string]string "Not Found"
 // @Router /Abuseip/{ip} [get]
 func (har *HandlerAssetsResponse) GetHandler(c *gin.Context) {
@@ -220,7 +221,7 @@ func (har *HandlerAssetsResponse) GetHandler(c *gin.Context) {
 			return
 		}
 	}
-	entity := DBqueries.GetEntity(connect.PostgresqlConnect(), ip)
+	entity := har.service.CRUDList.GetEntity(ip)
 	if entity == nil {
 		c.JSON(404, gin.H{"error": "Not Found"})
 		return

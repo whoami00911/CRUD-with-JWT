@@ -11,13 +11,11 @@ import (
 	"time"
 
 	_ "webPractice1/docs"
+	"webPractice1/internal/repository"
 	"webPractice1/internal/server"
+	"webPractice1/internal/service"
 	"webPractice1/internal/transport/handlers"
 	"webPractice1/pkg/logger"
-
-	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"     // swagger embed files
-	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
 
 // @title           rest with swagger
@@ -29,27 +27,18 @@ import (
 
 func main() {
 	logger := logger.GetLogger()
-	router := gin.Default()
-	handler := handlers.NewHandlerAssetsResponse(logger)
+	repo := repository.NewRepository(repository.PostgresqlConnect(), logger)
+	service := service.NewService(repo)
+	handler := handlers.NewHandlerAssetsResponse(logger, service)
 	//http.HandleFunc("/Abuseip/", handler.TaskHandler)
-	abuseipGroup := router.Group("/Abuseip")
-	{
-		abuseipGroup.POST("/", handler.CreateHandler)
-		abuseipGroup.PUT("/", handler.UpdateHandler)
-		abuseipGroup.GET("/", handler.GetAllHandler)
-		abuseipGroup.DELETE("/", handler.DeleteAllHandler)
 
-		// Обработка маршрутов с IP
-		abuseipGroup.GET("/:ip", handler.GetHandler)
-		abuseipGroup.DELETE("/:ip", handler.DeleteHandler)
-	}
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	srv, err := server.StartServer(router)
-	if err != nil {
-		logger.Error(fmt.Sprintf("Server dont start: %s", err))
-	}
-
+	srv := new(server.Server)
+	go func() {
+		err := srv.StartServer(handler.InitRoutes())
+		if err != nil {
+			logger.Error(fmt.Sprintf("Server dont start: %s", err))
+		}
+	}()
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit

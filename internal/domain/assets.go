@@ -1,4 +1,4 @@
-package responces
+package domain
 
 import (
 	"sync"
