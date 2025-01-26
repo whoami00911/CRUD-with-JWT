@@ -22,7 +22,7 @@ func (c *CRUD) UpdateEntity(ar domain.AssetData) {
 	}()
 	ar.IsDb = true
 	_, err = tx.Exec(
-		`UPDATE "AbuseEntity" SET "isPublic" = $1, "ipVersion" = $2, "isWhitelisted" = $3, "abuseConfidenceScore" = $4, "countryCode" = $5, "countryName" = $6, "usageType" = $7, "isFromDB" = $8, "isTor" = $9, "isp" = $10 WHERE "ipAddress" = $11`, ar.IsPublic, ar.IPVersion, ar.IsWhitelisted, ar.AbuseConfidenceScore,
+		`UPDATE "`+c.crudDb+`" SET "isPublic" = $1, "ipVersion" = $2, "isWhitelisted" = $3, "abuseConfidenceScore" = $4, "countryCode" = $5, "countryName" = $6, "usageType" = $7, "isFromDB" = $8, "isTor" = $9, "isp" = $10 WHERE "ipAddress" = $11`, ar.IsPublic, ar.IPVersion, ar.IsWhitelisted, ar.AbuseConfidenceScore,
 		ar.CountryCode, ar.CountryName, ar.UsageType, ar.IsDb, ar.IsTor, ar.ISP, ar.IPAddress)
 	if err != nil {
 		c.logger.Error(fmt.Sprintf("UPDATE ERROR: %s", err))

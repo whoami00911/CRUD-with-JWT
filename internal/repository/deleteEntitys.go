@@ -19,7 +19,7 @@ func (c *CRUD) DeleteAllEntitiesDB() {
 			tx.Commit()
 		}
 	}()
-	_, err = tx.Exec(`DELETE FROM "AbuseEntity"`)
+	_, err = tx.Exec(`DELETE FROM "` + c.crudDb + `"`)
 	if err != nil {
 		c.logger.Error(fmt.Sprintf("DELETE IN DB ERROR: %s", err))
 		return
@@ -41,7 +41,7 @@ func (c *CRUD) DeleteEntityDB(ip string) {
 			tx.Commit()
 		}
 	}()
-	_, err = tx.Exec(fmt.Sprintf(`DELETE FROM "AbuseEntity" WHERE "ipAddress" = '%s'`, ip))
+	_, err = tx.Exec(`DELETE FROM "`+c.crudDb+`" WHERE "ipAddress" = $1`, ip)
 	if err != nil {
 		c.logger.Error(fmt.Sprintf("DELETE IN DB ERROR: %s", err))
 		return

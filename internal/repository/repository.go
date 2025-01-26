@@ -7,7 +7,8 @@ import (
 )
 
 type Authorization interface {
-	CreateUser(user domain.User) (int, error)
+	CreateUser(user domain.User) int
+	GetUser(user, password string) int
 }
 
 type CRUDList interface {
@@ -26,7 +27,7 @@ type Repository struct {
 
 func NewRepository(db *sql.DB, log *logger.Logger) *Repository {
 	return &Repository{
-		Authorization: NewAuthUserDbInicialize(db),
+		Authorization: NewAuthUserDbInicialize(db, log),
 		CRUDList:      NewCrudDbInicialize(db, log),
 	}
 }

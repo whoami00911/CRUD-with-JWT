@@ -3,10 +3,14 @@ package service
 import (
 	"webPractice1/internal/domain"
 	"webPractice1/internal/repository"
+	"webPractice1/pkg/hasher"
+	"webPractice1/pkg/logger"
 )
 
 type Autherization interface {
-	CreateUser(user domain.User) (int, error)
+	CreateUser(user domain.User) int
+	//GenHashPass(password string) string
+	GenToken(user, password string) (string, error)
 }
 
 type CRUDList interface {
@@ -23,9 +27,9 @@ type Service struct {
 	CRUDList
 }
 
-func NewService(repos *repository.Repository) *Service {
+func NewService(repos *repository.Repository, hash *hasher.Hash, logger *logger.Logger) *Service {
 	return &Service{
-		Autherization: NewAuthService(repos.Authorization),
+		Autherization: NewAuthService(repos.Authorization, hash, logger),
 		CRUDList:      NewServiceCRUD(repos.CRUDList),
 	}
 }

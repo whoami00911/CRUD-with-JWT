@@ -12,9 +12,9 @@ type Server struct {
 	httpServer *http.Server
 }
 
-func (s *Server) StartServer(router *gin.Engine) error {
+func (s *Server) StartServer(router *gin.Engine, port string) error {
 	s.httpServer = &http.Server{
-		Addr:         ":8080", //заменить на конфигурацию
+		Addr:         ":" + port,
 		Handler:      router,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,

@@ -22,7 +22,7 @@ func (c *CRUD) GetEntity(ip string) *domain.AssetData {
 			tx.Commit() // Commit if no errors occurred
 		}
 	}()
-	query, err := tx.Query(fmt.Sprintf(`SELECT * FROM "AbuseEntity" WHERE "ipAddress"='%s'`, ip))
+	query, err := tx.Query(`SELECT * FROM "`+c.crudDb+`" WHERE "ipAddress"=$1`, ip)
 	if err != nil {
 		c.logger.Error(fmt.Sprintf("INSERT ERROR: %s", err))
 	}
@@ -50,7 +50,7 @@ func (c *CRUD) GetEntities() []domain.AssetData {
 			tx.Commit()
 		}
 	}()
-	query, err := tx.Query(`SELECT * FROM "AbuseEntity"`)
+	query, err := tx.Query(`SELECT * FROM "` + c.crudDb + `"`)
 	if err != nil {
 		c.logger.Error(fmt.Sprintf("INSERT ERROR: %s", err))
 	}

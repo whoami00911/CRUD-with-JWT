@@ -37,25 +37,25 @@ type Postgres struct {
 
 func PostgresqlConnect() *sql.DB {
 	logger := logger.GetLogger()
-	if err := godotenv.Load("../.env"); err != nil {
-		logger.Error(fmt.Sprintf("Truntransaction not started: %s", err))
+	if err := godotenv.Load(".env"); err != nil {
+		logger.Error(fmt.Sprintf("godotenv can't load env: %s", err))
 	}
 	cfg := ConfigInicialize()
 	if err := envconfig.Process("db", &cfg.DB); err != nil {
-		logger.Error(fmt.Sprintf("Truntransaction not started: %s", err))
+		logger.Error(fmt.Sprintf("envconfig cant parse to struct: %s", err))
 	}
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		cfg.DB.Host, cfg.DB.Port, cfg.DB.User, cfg.DB.Password, cfg.DB.Dbname)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-		logger.Error(fmt.Sprintf("Truntransaction not started: %s", err))
+		logger.Error(fmt.Sprintf("Open connection to db failed: %s", err))
 		connectWithRetry(cfg)
 	}
 
 	err = db.Ping()
 	if err != nil {
-		logger.Error(fmt.Sprintf("Truntransaction not started: %s", err))
+		logger.Error(fmt.Sprintf("ping db failed: %s", err))
 		connectWithRetry(cfg)
 		db.Close()
 	}
@@ -91,11 +91,11 @@ func connectWithRetry(cfg *Config) *sql.DB {
 		}
 
 		fmt.Printf("Не удалось подключиться, ожидаем %v перед повторной попыткой...\n", cfg.RetryDelay)
-		logger.Error(fmt.Sprintf("Retry connect to DB faild: %s", err))
 		time.Sleep(cfg.RetryDelay)
 	}
 
 	// Возвращаем ошибку, если не удалось подключиться
+	logger.Error(fmt.Sprintf("Retry connect to DB faild: %s", err))
 	fmt.Println(fmt.Sprintf("не удалось подключиться к базе данных после %d попыток: %s", cfg.MaxRetries, err))
 	return nil
 }

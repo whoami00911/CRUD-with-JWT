@@ -1,0 +1,13 @@
+server:
+  port: 8080
+
+token:
+  token_ttl: 24h
+  token_salt: petersburgSalt
+  token_key: someKey
+
+db_tables:
+  crud: AbuseEntity
+  auth: users
+
+hashphrase: somesalte

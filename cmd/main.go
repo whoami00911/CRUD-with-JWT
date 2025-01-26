@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"net/http"
 	"context"
 	"fmt"
 	"log"
@@ -15,7 +14,10 @@ import (
 	"webPractice1/internal/server"
 	"webPractice1/internal/service"
 	"webPractice1/internal/transport/handlers"
+	"webPractice1/pkg/hasher"
 	"webPractice1/pkg/logger"
+
+	"github.com/spf13/viper"
 )
 
 // @title           rest with swagger
@@ -24,17 +26,24 @@ import (
 
 // @host      localhost:8080
 // @BasePath  /
-
-func main() {
+func init() {
+	viper.AddConfigPath("configs")
+	viper.SetConfigName("config")
+	viper.ReadInConfig()
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("Ошибка при чтении конфигурации: %v", err)
+	}
+}
+func main() { ///////изменить логику обработки ошибок, добавить error в методы БД, чтобы в хендлерах выдавать 500
 	logger := logger.GetLogger()
+	hash := hasher.NewHashInit(viper.GetString("hashphrase"))
 	repo := repository.NewRepository(repository.PostgresqlConnect(), logger)
-	service := service.NewService(repo)
+	service := service.NewService(repo, hash, logger)
 	handler := handlers.NewHandlerAssetsResponse(logger, service)
-	//http.HandleFunc("/Abuseip/", handler.TaskHandler)
 
 	srv := new(server.Server)
 	go func() {
-		err := srv.StartServer(handler.InitRoutes())
+		err := srv.StartServer(handler.InitRoutes(), viper.GetString("server.port"))
 		if err != nil {
 			logger.Error(fmt.Sprintf("Server dont start: %s", err))
 		}

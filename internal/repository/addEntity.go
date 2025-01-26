@@ -21,7 +21,7 @@ func (c *CRUD) AddEntity(ar domain.AssetData) {
 	}()
 	ar.IsDb = true
 	_, err = tx.Exec(
-		`INSERT INTO "AbuseEntity" ("ipAddress", "isPublic", "ipVersion", "isWhitelisted", "abuseConfidenceScore", "countryCode", "countryName", "usageType", "isFromDB", "isTor", "isp")
+		`INSERT INTO "`+c.crudDb+`" ("ipAddress", "isPublic", "ipVersion", "isWhitelisted", "abuseConfidenceScore", "countryCode", "countryName", "usageType", "isFromDB", "isTor", "isp")
 		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT ("ipAddress")
 		DO NOTHING`, ar.IPAddress, ar.IsPublic, ar.IPVersion, ar.IsWhitelisted, ar.AbuseConfidenceScore,
 		ar.CountryCode, ar.CountryName, ar.UsageType, ar.IsDb, ar.IsTor, ar.ISP)

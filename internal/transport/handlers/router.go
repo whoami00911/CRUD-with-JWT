@@ -19,6 +19,13 @@ func (har *HandlerAssetsResponse) InitRoutes() *gin.Engine {
 		abuseipGroup.GET("/:ip", har.GetHandler)
 		abuseipGroup.DELETE("/:ip", har.DeleteHandler)
 	}
+
+	authServiceGroup := router.Group("/auth")
+	{
+		authServiceGroup.POST("/signUp", har.singUp)
+		authServiceGroup.POST("/signIn", har.singIn)
+	}
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return router
 }
