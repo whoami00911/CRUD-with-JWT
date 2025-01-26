@@ -8,7 +8,7 @@ import (
 
 func (har *HandlerAssetsResponse) InitRoutes() *gin.Engine {
 	router := gin.Default()
-	abuseipGroup := router.Group("/Abuseip")
+	abuseipGroup := router.Group("/Abuseip", har.userIdentity)
 	{
 		abuseipGroup.POST("/", har.CreateHandler)
 		abuseipGroup.PUT("/", har.UpdateHandler)

@@ -59,9 +59,29 @@ func (as *AuthService) GenToken(user, password string) (string, error) {
 		},
 		UserId: id,
 	})
-	tokenString, err := token.SignedString([]byte(viper.GetString("token.salt")))
+	tokenString, err := token.SignedString([]byte(viper.GetString("token.token_key")))
 	if err != nil {
 		as.logger.Error(fmt.Sprintf("failed to get token signed string: %s", err))
 	}
 	return tokenString, nil
+}
+
+func (as *AuthService) ParseToken(accessToken string) (int, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &jwtToken{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("invalid signing method")
+		}
+
+		return []byte(viper.GetString("token.token_key")), nil
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	claims, ok := token.Claims.(*jwtToken)
+	if !ok {
+		return 0, errors.New("token claims are not of type *tokenClaims")
+	}
+
+	return claims.UserId, nil
 }

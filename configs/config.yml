@@ -3,8 +3,7 @@ server:
 
 token:
   token_ttl: 24h
-  token_salt: petersburgSalt
-  token_key: someKey
+  token_key: petersburgSalt
 
 db_tables:
   crud: AbuseEntity

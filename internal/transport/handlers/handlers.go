@@ -40,6 +40,11 @@ func NewHandlerAssetsResponse(log *logger.Logger, service *service.Service) *Han
 // @Failure 500 {object} map[string]string "Internal Server Error"
 // @Router /Abuseip/ [get]
 func (har *HandlerAssetsResponse) GetAllHandler(c *gin.Context) {
+	_, ok := c.Get("UserId")
+	if !ok {
+		c.JSON(401, gin.H{"error": "bad token"})
+		return
+	}
 	jsonData, err := json.Marshal(har.service.CRUDList.GetEntities())
 	if err != nil {
 		har.Logger.Error(fmt.Sprintf("Marshal method error: %s", err))
@@ -60,6 +65,11 @@ func (har *HandlerAssetsResponse) GetAllHandler(c *gin.Context) {
 // @Failure 400 {object} map[string]string "Bad Request"
 // @Router /Abuseip/ [post]
 func (har *HandlerAssetsResponse) CreateHandler(c *gin.Context) {
+	_, ok := c.Get("UserId")
+	if !ok {
+		c.JSON(401, gin.H{"error": "bad token"})
+		return
+	}
 	har.Mu.Lock()
 	defer har.Mu.Unlock()
 
@@ -114,6 +124,11 @@ func (har *HandlerAssetsResponse) CreateHandler(c *gin.Context) {
 // @Failure 400 {object} map[string]string "Bad Request"
 // @Router /Abuseip/ [put]
 func (har *HandlerAssetsResponse) UpdateHandler(c *gin.Context) {
+	_, ok := c.Get("UserId")
+	if !ok {
+		c.JSON(401, gin.H{"error": "bad token"})
+		return
+	}
 	har.Mu.Lock()
 	defer har.Mu.Unlock()
 
@@ -163,6 +178,11 @@ func (har *HandlerAssetsResponse) UpdateHandler(c *gin.Context) {
 // @Success 200 {object} map[string]string "All entitys deleted"
 // @Router /Abuseip/ [delete]
 func (har *HandlerAssetsResponse) DeleteAllHandler(c *gin.Context) {
+	_, ok := c.Get("UserId")
+	if !ok {
+		c.JSON(401, gin.H{"error": "bad token"})
+		return
+	}
 	har.Mu.Lock()
 	defer har.Mu.Unlock()
 	for v := range har.Cache {
@@ -181,6 +201,11 @@ func (har *HandlerAssetsResponse) DeleteAllHandler(c *gin.Context) {
 // @Failure 404 {object} map[string]string "Not Found"
 // @Router /Abuseip/{ip} [delete]
 func (har *HandlerAssetsResponse) DeleteHandler(c *gin.Context) {
+	_, ok := c.Get("UserId")
+	if !ok {
+		c.JSON(401, gin.H{"error": "bad token"})
+		return
+	}
 	ip := c.Param("ip")
 	har.Mu.Lock()
 	defer har.Mu.Unlock()
@@ -204,6 +229,11 @@ func (har *HandlerAssetsResponse) DeleteHandler(c *gin.Context) {
 // @Failure 404 {object} map[string]string "Not Found"
 // @Router /Abuseip/{ip} [get]
 func (har *HandlerAssetsResponse) GetHandler(c *gin.Context) {
+	_, ok := c.Get("UserId")
+	if !ok {
+		c.JSON(401, gin.H{"error": "bad token"})
+		return
+	}
 	ip := c.Param("ip")
 	har.Mu.Lock()
 	defer har.Mu.Unlock()

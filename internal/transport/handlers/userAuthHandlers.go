@@ -38,6 +38,7 @@ func (har *HandlerAssetsResponse) singIn(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "something wrong"})
 		return
 	}
+	//c.Header("Authorization", "Bearer "+token) //отправить в хедере
 	c.JSON(200, map[string]string{
 		"token": token,
 	})

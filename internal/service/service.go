@@ -9,8 +9,8 @@ import (
 
 type Autherization interface {
 	CreateUser(user domain.User) int
-	//GenHashPass(password string) string
 	GenToken(user, password string) (string, error)
+	ParseToken(token string) (int, error)
 }
 
 type CRUDList interface {
