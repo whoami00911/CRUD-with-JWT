@@ -2,11 +2,13 @@ server:
   port: 8080
 
 token:
-  token_ttl: 24h
+  token_ttl: 1m
   token_key: petersburgSalt
+  refreshToken_ttl: 1440h
 
 db_tables:
   crud: AbuseEntity
   auth: users
+  tokens: refresh_tokens
 
 hashphrase: somesalte

@@ -11,12 +11,12 @@ func (c *CRUD) GetEntity(ip string) *domain.AssetData {
 	defer asset.Mu.Unlock()
 	tx, err := c.db.Begin()
 	if err != nil {
-		c.logger.Error(fmt.Sprintf("Truntransaction not started: %s", err))
+		c.logger.Error(fmt.Sprintf("transaction not started: %s", err))
 	}
 	defer func() {
 		if err != nil {
 			tx.Rollback() // Rollback only if there was an error
-			c.logger.Error(fmt.Sprintf("Something wrong with truntransaction: %s", err))
+			c.logger.Error(fmt.Sprintf("Something wrong with transaction: %s", err))
 			return
 		} else {
 			tx.Commit() // Commit if no errors occurred
@@ -45,7 +45,7 @@ func (c *CRUD) GetEntities() []domain.AssetData {
 	defer func() {
 		if err != nil {
 			tx.Rollback()
-			c.logger.Error(fmt.Sprintf("Something wrong with truntransaction: %s", err))
+			c.logger.Error(fmt.Sprintf("Something wrong with transaction: %s", err))
 		} else {
 			tx.Commit()
 		}

@@ -20,12 +20,22 @@ import (
 	"github.com/spf13/viper"
 )
 
-// @title           rest with swagger
+// @title           rest with swagger and authorization with JWT tokens
 // @version         1.0
-// @description     project4
-
+// @description     project5
+//
 // @host      localhost:8080
 // @BasePath  /
+//
+// JWT Authentication:
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+//
+// RefreshToken authentication
+// @securityDefinitions.apikey RefreshTokenAuth
+// @in header
+// @name RefreshToken
 func init() {
 	viper.AddConfigPath("configs")
 	viper.SetConfigName("config")
@@ -34,7 +44,7 @@ func init() {
 		log.Fatalf("Ошибка при чтении конфигурации: %v", err)
 	}
 }
-func main() { ///////изменить логику обработки ошибок, добавить error в методы БД, чтобы в хендлерах выдавать 500
+func main() {
 	logger := logger.GetLogger()
 	hash := hasher.NewHashInit(viper.GetString("hashphrase"))
 	repo := repository.NewRepository(repository.PostgresqlConnect(), logger)
@@ -48,6 +58,7 @@ func main() { ///////изменить логику обработки ошибо
 			logger.Error(fmt.Sprintf("Server dont start: %s", err))
 		}
 	}()
+
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
@@ -58,7 +69,7 @@ func main() { ///////изменить логику обработки ошибо
 	if err := srv.Shutdown(ctx); err != nil {
 		logger.Error(fmt.Sprintf("Shutdown error: %s", err))
 	}
-	// catching ctx.Done(). timeout of 5 seconds.
+
 	select {
 	case <-ctx.Done():
 		log.Println("timeout of 1 seconds.")

@@ -24,6 +24,7 @@ func (har *HandlerAssetsResponse) InitRoutes() *gin.Engine {
 	{
 		authServiceGroup.POST("/signUp", har.singUp)
 		authServiceGroup.POST("/signIn", har.singIn)
+		authServiceGroup.GET("/refresh", har.RefreshHandler)
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

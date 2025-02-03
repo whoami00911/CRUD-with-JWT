@@ -7,13 +7,13 @@ import (
 func (c *CRUD) DeleteAllEntitiesDB() {
 	tx, err := c.db.Begin()
 	if err != nil {
-		c.logger.Error(fmt.Sprintf("Truntransaction not started: %s", err))
+		c.logger.Error(fmt.Sprintf("transaction not started: %s", err))
 		return
 	}
 	defer func() {
 		if err != nil {
 			tx.Rollback()
-			c.logger.Error(fmt.Sprintf("Something wrong with truntransaction: %s", err))
+			c.logger.Error(fmt.Sprintf("Something wrong with transaction: %s", err))
 			return
 		} else {
 			tx.Commit()
@@ -29,13 +29,13 @@ func (c *CRUD) DeleteAllEntitiesDB() {
 func (c *CRUD) DeleteEntityDB(ip string) {
 	tx, err := c.db.Begin()
 	if err != nil {
-		c.logger.Error(fmt.Sprintf("Truntransaction not started: %s", err))
+		c.logger.Error(fmt.Sprintf("transaction not started: %s", err))
 		return
 	}
 	defer func() {
 		if err != nil {
 			tx.Rollback()
-			c.logger.Error(fmt.Sprintf("Something wrong with truntransaction: %s", err))
+			c.logger.Error(fmt.Sprintf("Something wrong with transaction: %s", err))
 			return
 		} else {
 			tx.Commit()

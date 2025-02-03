@@ -37,11 +37,34 @@ definitions:
         description: Тип использования (например, дата-центр/веб-хостинг)
         type: string
     type: object
+  domain.User:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - name
+    - password
+    - username
+    type: object
+  domain.UserSignIn:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
 host: localhost:8080
 info:
   contact: {}
-  description: project4
-  title: rest with swagger
+  description: project5
+  title: rest with swagger and authorization with JWT tokens
   version: "1.0"
 paths:
   /Abuseip/:
@@ -54,6 +77,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete all entitys
       tags:
       - CRUD
@@ -74,6 +99,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get all entitys
       tags:
       - CRUD
@@ -103,6 +130,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Create a new entity
       tags:
       - CRUD
@@ -132,6 +161,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Update existing entity
       tags:
       - CRUD
@@ -157,6 +188,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Delete an entity by IP
       tags:
       - CRUD
@@ -181,7 +214,121 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Get an entity by IP
       tags:
       - CRUD
+  /auth/refresh:
+    get:
+      consumes:
+      - application/json
+      description: Refreshes the JWT token and refresh token using the provided refresh
+        token from the cookie.
+      parameters:
+      - description: Refresh token from the cookie
+        in: header
+        name: CookieToken
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated JWT token and new refresh token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad cookie or token refresh error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Obsolete token or unauthorized access
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Refresh Tokens
+      tags:
+      - Auth
+  /auth/signIn:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user using provided credentials (username and password).
+        Returns a JWT token and a refresh token upon successful authentication.
+      parameters:
+      - description: User credentials for sign in
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UserSignIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: JWT token and refresh token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid input or incorrect username/password
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: User Authentication
+      tags:
+      - Auth
+  /auth/signUp:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user and store it in the database
+      parameters:
+      - description: Domain User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/domain.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User ID
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new user
+      tags:
+      - Auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+  RefreshTokenAuth:
+    in: header
+    name: RefreshToken
+    type: apiKey
 swagger: "2.0"

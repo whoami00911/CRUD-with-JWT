@@ -38,6 +38,7 @@ func NewHandlerAssetsResponse(log *logger.Logger, service *service.Service) *Han
 // @Produce json
 // @Success 200 {array} domain.AssetData
 // @Failure 500 {object} map[string]string "Internal Server Error"
+// @Security BearerAuth
 // @Router /Abuseip/ [get]
 func (har *HandlerAssetsResponse) GetAllHandler(c *gin.Context) {
 	_, ok := c.Get("UserId")
@@ -63,6 +64,7 @@ func (har *HandlerAssetsResponse) GetAllHandler(c *gin.Context) {
 // @Param asset body domain.AssetData true "Asset Data"
 // @Success 201 {object} map[string]string "Created"
 // @Failure 400 {object} map[string]string "Bad Request"
+// @Security BearerAuth
 // @Router /Abuseip/ [post]
 func (har *HandlerAssetsResponse) CreateHandler(c *gin.Context) {
 	_, ok := c.Get("UserId")
@@ -122,6 +124,7 @@ func (har *HandlerAssetsResponse) CreateHandler(c *gin.Context) {
 // @Param asset body domain.AssetData true "Asset Data"
 // @Success 201 {object} map[string]string "Updated"
 // @Failure 400 {object} map[string]string "Bad Request"
+// @Security BearerAuth
 // @Router /Abuseip/ [put]
 func (har *HandlerAssetsResponse) UpdateHandler(c *gin.Context) {
 	_, ok := c.Get("UserId")
@@ -176,6 +179,7 @@ func (har *HandlerAssetsResponse) UpdateHandler(c *gin.Context) {
 // @Description Delete all entitys from cache and database
 // @Tags CRUD
 // @Success 200 {object} map[string]string "All entitys deleted"
+// @Security BearerAuth
 // @Router /Abuseip/ [delete]
 func (har *HandlerAssetsResponse) DeleteAllHandler(c *gin.Context) {
 	_, ok := c.Get("UserId")
@@ -199,6 +203,7 @@ func (har *HandlerAssetsResponse) DeleteAllHandler(c *gin.Context) {
 // @Param ip path string true "IP Address"
 // @Success 200 {object} map[string]string "entity deleted"
 // @Failure 404 {object} map[string]string "Not Found"
+// @Security BearerAuth
 // @Router /Abuseip/{ip} [delete]
 func (har *HandlerAssetsResponse) DeleteHandler(c *gin.Context) {
 	_, ok := c.Get("UserId")
@@ -227,6 +232,7 @@ func (har *HandlerAssetsResponse) DeleteHandler(c *gin.Context) {
 // @Produce json
 // @Success 200 {object} domain.AssetData
 // @Failure 404 {object} map[string]string "Not Found"
+// @Security BearerAuth
 // @Router /Abuseip/{ip} [get]
 func (har *HandlerAssetsResponse) GetHandler(c *gin.Context) {
 	_, ok := c.Get("UserId")
